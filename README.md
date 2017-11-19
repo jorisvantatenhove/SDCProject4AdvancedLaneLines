@@ -1,39 +1,78 @@
 ## Advanced Lane Finding
 [![Udacity - Self-Driving Car NanoDegree](https://s3.amazonaws.com/udacity-sdc/github/shield-carnd.svg)](http://www.udacity.com/drive)
 
+[//]: # (Image References)
 
-In this project, your goal is to write a software pipeline to identify the lane boundaries in a video, but the main output or product we want you to create is a detailed writeup of the project.  Check out the [writeup template](https://github.com/udacity/CarND-Advanced-Lane-Lines/blob/master/writeup_template.md) for this project and use it as a starting point for creating your own writeup.  
+[image1]: ./examples/chessboard_corners.png "Chessboard corners 1"
+[image2]: ./examples/chessboard_corners2.png "Chessboard corners 2"
+[image3]: ./examples/frame1_input.png "Frame 1 input"
+[image4]: ./examples/frame1_corrected.png "Frame 1 corrected"
+[image5]: ./examples/frame1_warped.png "Frame 1 warped"
+[image6]: ./examples/frame1_sobel.png "Frame 1 sobel"
+[image7]: ./examples/frame1_thresholded.png "Frame 1 saturation"
+[image8]: ./examples/frame1_binary.png "Frame 1 merged binary image"
+[image9]: ./examples/frame1_output.png "Frame 1 output"
 
-Creating a great writeup:
----
-A great writeup should include the rubric points as well as your description of how you addressed each point.  You should include a detailed description of the code used in each step (with line-number references and code snippets where necessary), and links to other supporting documents or external references.  You should include images in your writeup to demonstrate how your code works with examples.  
 
-All that said, please be concise!  We're not looking for you to write a book here, just a brief description of how you passed each rubric point, and references to the relevant code :). 
+### Project Overview
 
-You're not required to use markdown for your writeup.  If you use another method please just submit a pdf of your writeup.
+In the fourth project, the goal is similar as the first project: we again try to automatically define lane lines. This time however, we use more advanced techniques and try to take road curvature into account as well.
 
-The Project
----
+We first preprocess the input images in order to get rid of some camera artifacts, and then transform the image and fit a second degree polynomial to the two most well defined lines in the image.
 
-The goals / steps of this project are the following:
+In the preproccesing step, we load calibration images of a chessboard patterns shot from different angles, in order to calculate the distortion.
 
-* Compute the camera calibration matrix and distortion coefficients given a set of chessboard images.
-* Apply a distortion correction to raw images.
-* Use color transforms, gradients, etc., to create a thresholded binary image.
-* Apply a perspective transform to rectify binary image ("birds-eye view").
-* Detect lane pixels and fit to find the lane boundary.
-* Determine the curvature of the lane and vehicle position with respect to center.
-* Warp the detected lane boundaries back onto the original image.
-* Output visual display of the lane boundaries and numerical estimation of lane curvature and vehicle position.
+After calculating the distortion, we know how we can warp the image our camera shoots to more accurately reflect reality. On these warped images, we detect lane lines using the following procedure:
 
-The images for camera calibration are stored in the folder called `camera_cal`.  The images in `test_images` are for testing your pipeline on single frames.  If you want to extract more test images from the videos, you can simply use an image writing method like `cv2.imwrite()`, i.e., you can read the video in frame by frame as usual, and for frames you want to save for later you can write to an image file.  
+* Perform a perspective transform on these images to get rid of unnecessary footage and also make it more easier to fit polynomials to the lane lines
+* Use thresholded color transformations and Sobel gradients to create a binary image
+* Detect lane lines in the binary image
+* Determine curvature of the lane, and the vehicles position relative to the lane
+* Wrap the detected lane lines back to the original image
+* Display the detected lane lines, curvature and vehicle position
 
-To help the reviewer examine your work, please save examples of the output from each stage of your pipeline in the folder called `ouput_images`, and include a description in your writeup for the project of what each image shows.    The video called `project_video.mp4` is the video your pipeline should work well on.  
+The result of this procedure on a sample video can be found in `lane_lines.mp4`. The code is found in `project.py`.
 
-The `challenge_video.mp4` video is an extra (and optional) challenge for you if you want to test your pipeline under somewhat trickier conditions.  The `harder_challenge.mp4` video is another optional challenge and is brutal!
+### Step by step description
 
-If you're feeling ambitious (again, totally optional though), don't stop there!  We encourage you to go out and take video of your own, calibrate your camera and show us how you would implement this project from scratch!
+First, we calibrate the camera using 20 input photos of chessboards. Since we know that these should be flat, we can calculate the distortion in the sides of the picture. We can automatically detect the chessboard corners. Here are two examples of the images where we've detected the corners of the chess fields:
 
-## How to write a README
-A well written README file can enhance your project and portfolio.  Develop your abilities to create professional README files by completing [this free course](https://www.udacity.com/course/writing-readmes--ud777).
+![alt text][image1]
 
+![alt text][image2]
+
+After calibration the camera, we can start the real work! We show the process by following what happens to the first frame:
+
+![alt text][image3]
+
+After correcting for the distortion, we find the following image:
+
+![alt text][image4]
+
+Then, we warp the section of the image where we expect the lane lines to be to a birds eye view:
+
+![alt text][image5]
+
+We apply two kinds of lane detection. The first one is a Sobel gradient in the x-direction:
+
+![alt text][image6]
+
+The second one uses the Saturation channel of the image converted to the HLS colour scheme:
+
+![alt text][image7]
+
+Then, we merge the two binary images into a single binary image:
+
+![alt text][image8]
+
+Using the histogram and sliding window search as described in slides 33 and 34 of the Advanced Lane Finding course, we detect the lane lines, warp them back and plot them in the original image.
+
+Also, we measure the offset of the car by averaging the position of the right and left lane lines to detect the middle of the lane, and compare this to the middle frame on 640 pixels in the x-axis.
+
+Lastly, we also measure the radius of curvature as defined by the formula in slide 35 in the Advanced Lane Finding course. 
+
+Taking this together, we find the following frame:
+
+![alt text][image9]
+
+Applying this procedure to every single frame gives us the result that can be found in the video!
