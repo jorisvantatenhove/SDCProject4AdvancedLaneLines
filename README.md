@@ -37,33 +37,33 @@ The result of this procedure on a sample video can be found in `lane_lines.mp4`.
 
 First, we calibrate the camera using 20 input photos of chessboards. Since we know that these should be flat, we can calculate the distortion in the sides of the picture. We can automatically detect the chessboard corners. Here are two examples of the images where we've detected the corners of the chess fields:
 
-![alt text][image1]
+![Chessboard example 1][image1]
 
-![alt text][image2]
+![Chessboard example 2][image2]
 
 After calibration the camera, we can start the real work! We show the process by following what happens to the first frame:
 
-![alt text][image3]
+![Input frame][image3]
 
 After correcting for the distortion, we find the following image:
 
-![alt text][image4]
+![Corrected frame][image4]
 
 Then, we warp the section of the image where we expect the lane lines to be to a birds eye view:
 
-![alt text][image5]
+![Warped frame][image5]
 
 We apply two kinds of lane detection. The first one is a Sobel gradient in the x-direction:
 
-![alt text][image6]
+![Sobel transformation][image6]
 
 The second one uses the Saturation channel of the image converted to the HLS colour scheme:
 
-![alt text][image7]
+![Saturation transformation][image7]
 
 Then, we merge the two binary images into a single binary image:
 
-![alt text][image8]
+![Merged binary image][image8]
 
 Using the histogram and sliding window search as described in slides 33 and 34 of the Advanced Lane Finding course, we detect the lane lines, warp them back and plot them in the original image.
 
@@ -73,6 +73,6 @@ Lastly, we also measure the radius of curvature as defined by the formula in sli
 
 Taking this together, we find the following frame:
 
-![alt text][image9]
+![Output frame][image9]
 
 Applying this procedure to every single frame gives us the result that can be found in the video!
