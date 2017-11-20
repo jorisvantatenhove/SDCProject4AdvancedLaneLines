@@ -12,6 +12,8 @@
 [image7]: ./examples/frame1_thresholded.png "Frame 1 saturation"
 [image8]: ./examples/frame1_binary.png "Frame 1 merged binary image"
 [image9]: ./examples/frame1_output.png "Frame 1 output"
+[image10]: ./test_images/straight_lines1.jpg "Straight lines"
+[image11]: ./examples/warp_straight_lines.png "Warping straight lines"
 
 
 ### Project Overview
@@ -53,6 +55,11 @@ Then, we warp the section of the image where we expect the lane lines to be to a
 
 ![Warped frame][image5]
 
+The warping is chosen such that straight lane lines get mapped to approximately vertical lines in the birds eye view, such that we can correctly calculate the radius of curvature:
+
+![Straight lines][image10]
+![Warped straight lines][image11]
+
 We apply two kinds of lane detection. The first one is a Sobel gradient in the x-direction:
 
 ![Sobel transformation][image6]
@@ -76,3 +83,9 @@ Taking this together, we find the following frame:
 ![Output frame][image9]
 
 Applying this procedure to every single frame gives us the result that can be found in the video!
+
+### Discussion
+
+The biggest problem that this algorithm currently has are shadows or random highlights on the road. Applying a more robust approach that uses the lane lines from previous frames will improve performance there.
+
+Issues that we did not run into in the testing video but that would potentially be difficult to solve are sunshine, causing the road to lighten up, and driving behind another vehicle. Additional preprocessing steps could solve the first issue, and vehicle recognition in combination with a restriction on the portion on the image that we detect lane lines in will solve the second.

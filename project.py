@@ -58,15 +58,15 @@ def undistort(img, objpoints, imgpoints, plot=False):
     return undist
 
 
-def perspective_transform(undist, plot=False):
-    src = np.float32([[560, 440], [730, 440], [1120, 675], [230, 675]])
+def perspective_transform(undist, plot=True):
+    src = np.float32([[600, 440], [675, 440], [1120, 675], [200, 675]])
     dst = np.float32([[0, 0], [1280, 0], [1280, 720], [0, 720]])
 
     M = cv2.getPerspectiveTransform(src, dst)
 
     warped = cv2.warpPerspective(undist, M, (undist.shape[1], undist.shape[0]))
     if plot:
-        plt.imshow(warped)
+        plt.imshow(cv2.cvtColor(warped, cv2.COLOR_BGR2RGB))
         plt.show()
     return warped
 
@@ -270,6 +270,10 @@ ny = 6  # Number of inside corners along the y-axis
 images = glob.glob('camera_cal/*.jpg')
 
 objpoints, imgpoints = find_all_chessboard_corners(images)
+
+# testimages = glob.glob('test_images/*.jpg')
+# for img in testimages:
+#    find_lane_lines(cv2.imread(img))
 
 clip1 = VideoFileClip("project_video.mp4")
 white_clip = clip1.fl_image(find_lane_lines)
